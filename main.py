@@ -25,7 +25,7 @@ isGreen = True
 flag = 0
 Last_RoB_Status = 0
 Current_RoB_Status = 0
-
+rec_ctr= 0
 #set up
 def setup():
     GPIO.setmode(GPIO.BOARD)       # Numbers GPIOs by physical location
@@ -111,11 +111,11 @@ def record():
     CHANNELS = 2
     RATE = 44100
     RECORD_SECONDS = 10
-    WAVE_OUTPUT_FILENAME = "record.wav"
+    WAVE_OUTPUT_FILENAME = "Desktop/recording" + str(rec_ctr)+ ".wav"
 
     p = pyaudio.PyAudio()
     recordAudio(CHUNK, FORMAT,CHANNELS, RATE, RECORD_SECONDS, WAVE_OUTPUT_FILENAME, p)
-
+    rec_ctr = rec_ctr + 1; # update record
     #then send to db
     
     
