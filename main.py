@@ -15,10 +15,16 @@ BtnPin = 29    # btn pin
 Gpin   = 22     #green
 Rpin   = 16     #red
 
-record = False #will signal this from the flask app
+record = True #will signal this from the flask app
 wav_ctr= 0
 output_file = None
 input_file = None
+
+globalCounter = 0.0  # Initialize as a float
+isGreen = True
+flag = 0
+Last_RoB_Status = 0
+Current_RoB_Status = 0
 
 #set up
 def setup():
@@ -104,7 +110,7 @@ def record():
     FORMAT = pyaudio.paInt16
     CHANNELS = 2
     RATE = 44100
-    RECORD_SECONDS = 5
+    RECORD_SECONDS = 10
     WAVE_OUTPUT_FILENAME = "record.wav"
 
     p = pyaudio.PyAudio()

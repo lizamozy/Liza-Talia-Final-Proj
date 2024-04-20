@@ -13,7 +13,7 @@ import pyaudio
 # RATE = 44100
 # RECORD_SECONDS = 5
 # WAVE_OUTPUT_FILENAME = "record.wav"
-
+frames = []
 # p = pyaudio.PyAudio()
 def connection(database):
     #get connection 
@@ -26,6 +26,7 @@ def connection(database):
 
 # Define the callback for recording
 def callback(in_data, frame_count, time_info, status):
+    global frames
     frames.append(in_data)
     return (in_data, pyaudio.paContinue)
 
@@ -38,7 +39,7 @@ def recordAudio(CHUNK:int, FORMAT: int, CHANNELS: int, RATE: int, RECORD_SECONDS
                     frames_per_buffer=CHUNK,
                     stream_callback=callback)
 
-    frames = []
+    
 
     # Start recording
     print("Recording...")
@@ -56,8 +57,7 @@ def recordAudio(CHUNK:int, FORMAT: int, CHANNELS: int, RATE: int, RECORD_SECONDS
 
     # Terminate the PortAudio interface
     p.terminate()
-    # recording = b''.join(frames)
-    # return recording 
+
     # Save recorded data to a wave file
     wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
     wf.setnchannels(CHANNELS)
@@ -66,8 +66,11 @@ def recordAudio(CHUNK:int, FORMAT: int, CHANNELS: int, RATE: int, RECORD_SECONDS
     wf.writeframes(b''.join(frames))
     wf.close()
 
-    conn = connection("Recording.db")
-    with conn: 
-        sql = '''INSERT INTO original (rec_name, rec_path)values(?,?)'''
+    conn = connection("Recordings.db")
+    with conn:
+        
+        sql = '''INSERT INTO original(rec_name, rec_path)values(?,?)'''
         cur = conn.cursor()
-        cur.execute(sql, (rec_name, ))
+        cur.execute(sql, (WAVE_OUTPUT_FILENAME[:-4], WAVE_OUTPUT_FILENAME))
+        conn.commit()
+    conn.close()
