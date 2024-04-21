@@ -78,6 +78,7 @@ def Led(x):
             #used the globalcounter to pass in speed factor
             if globalCounter  == 0:
                 wav_ctr = wav_ctr
+                save_edit(None, -1)
             elif globalCounter < 0: 
                 output_file = "Desktop/slowdown"+str(wav_ctr)+".wav"
                 wav_ctr= wav_ctr + 1
@@ -88,9 +89,6 @@ def Led(x):
                 #reset button 
 
             
-        
-        
-        
 def speed_up_wav(input_file, output_file, speed_factor):
     if input_file == None:
         print ("no file inputted--destroying")
@@ -102,8 +100,8 @@ def speed_up_wav(input_file, output_file, speed_factor):
     sped_up = audio.speedup(playback_speed=speed_factor)
 
     # Save the modified audio
-    edited = sped_up.export(output_file, format="wav")
-    save_edit(edited, 1)
+    sped_up.export(output_file, format="wav")
+    save_edit(output_file, 1)
 
 def save_edit(file, flag):
     conn = connection("Recordings.db")
