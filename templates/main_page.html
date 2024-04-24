@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The GWU IoT Lecture Recorder and Editer</title>
+    <title>Recording Player & Editor</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -74,62 +74,40 @@
     </style>
 </head>
 <body>
-    <h1>The GWU IoT Lecture Recorder and Editer</h1>
-
-    <label for="fileInput" class="upload-btn">Select Audio File</label>
-    <input type="file" id="fileInput" accept="audio/*">
+    <h1>Recording Player & Editor</h1>
     
     <div class="control-btns">
         <button id="recordBtn">Record Audio</button>
-        <button id="playBtn">Play</button>
-        <button id="stopBtn">Stop</button>
-        <button id="editBtn">Edit</button>
+        <button><a href="/bc986c10/view-original">Original Recordings</a></button>
+        <button><a href="/bc986c10/view-edited">Edited Recordings</a></button>
     </div>
-    
-    <audio id="audioPlayer" controls></audio>
 
     <script>
-        let audioPlayer = document.getElementById('audioPlayer');
         let recordBtn = document.getElementById('recordBtn');
-        let playBtn = document.getElementById('playBtn');
-        let stopBtn = document.getElementById('stopBtn');
-        let editBtn = document.getElementById('editBtn');
-        let fileInput = document.getElementById('fileInput');
-
-        let audioSrc = null;
-
-        fileInput.addEventListener('change', function(event) {
-            let file = event.target.files[0];
-            let objectURL = URL.createObjectURL(file);
-            audioPlayer.src = objectURL;
-            audioSrc = objectURL;
-        });
-
-        playBtn.addEventListener('click', function() {
-            if (audioSrc) {
-                audioPlayer.play();
-            } else {
-                alert('No audio selected.');
-            }
-        });
-
-        stopBtn.addEventListener('click', function() {
-            audioPlayer.pause();
-            audioPlayer.currentTime = 0;
-        });
-
-        editBtn.addEventListener('click', function() {
-            // Add your edit functionality here
-            alert('You are going to edit the speed an original audio. Press the button on the IoT device and turn the knob to proceed.');
-        });
 
         recordBtn.addEventListener('click', function() {
             alert('You are going to record a new audio. Press the button on the IoT device to proceed.');
             // Add your recording functionality here
+            fetch('http://128.164.137.144:8080/bc986c10/record')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Data from Python API:', data);
+                // Handle the response data here
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
         });
     </script>
 </body>
 </html>
+
+
 
 
 
