@@ -6,6 +6,8 @@ import sqlite3
 from sqlite3 import Error
 import time
 import pyaudio
+from flask import Flask, render_template, request
+import thing_file
 
 #set up pins first
 RoAPin = 11    # CLK Pin
@@ -37,6 +39,20 @@ def connection(database):
         print(e)
     return conn
 
+# ======== Initialize flask app ===========
+app = Flask(__name__)
+
+@app.route('/'+thing_file.thing_name)
+def show_home():
+    return render_template('main_page.html')
+
+#record route
+@app.route('/'+thing_file.thing_name+'/record')
+def start_record():
+    #api call to press button to record sound
+    #need to signal the global vairable to chnage recording=True
+    record()
+    
 #set up
 def setup():
     GPIO.setmode(GPIO.BOARD)       # Numbers GPIOs by physical location
@@ -238,3 +254,5 @@ if __name__ == '__main__':     # Program start from here
         loop()
     except KeyboardInterrupt:  
         destroy()
+    app.run(host="0.0.0.0", port=8080, debug=True)
+   
