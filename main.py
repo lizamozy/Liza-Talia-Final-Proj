@@ -17,16 +17,27 @@ BtnPin = 29    # btn pin
 Gpin   = 22     #green
 Rpin   = 16     #red
 
-record = True #will signal this from the flask app
+isRecording = False #will signal this from the flask app
 wav_ctr= 0
 output_file = None
-input_file = None
+input_file = 'recording22.wav'
+edit = 1
 
 globalCounter = 0.0  # Initialize as a float
-isGreen = True
+isGreen = False
 flag = 0
 Last_RoB_Status = 0
 Current_RoB_Status = 0
+rec_ctr= 0
+
+def connection(database):
+    #get connection 
+    conn = None 
+    try: 
+        conn = sqlite3.connect(database)
+    except Error as e: 
+        print(e)
+    return conn
 
 # ======== Initialize flask app ===========
 app = Flask(__name__)
@@ -70,30 +81,56 @@ def rotaryDeal():
         if (Last_RoB_Status == 0) and (Current_RoB_Status == 1) and isGreen:
             #slow down
             globalCounter = globalCounter - 0.1
+def index_original():
+    conn = connection("Recordings.db")
+    index = 0
+    with conn:
+        sql = '''select count(*) from original;'''
+        cur = conn.cursor()
+        cur.execute(sql)
+        index = cur.fetchone()
+        conn.commit()
+        
 
+    return index[0]
+def index_edit():
+    conn = connection("Recordings.db")
+    index = 0
+    with conn:
+        sql = '''select count(*) from edited;'''
+        cur = conn.cursor()
+        cur.execute(sql)
+        index = cur.fetchone()
+        conn.commit()
+    return index[0]
+    
 def Led(x):
+    global wav_ctr
+    global output_file
+    global isRecording
+    #print("x: ", x)
     if x:
         GPIO.output(Rpin, GPIO.LOW)
         GPIO.output(Gpin, GPIO.HIGH)
     else:
+        print(isRecording)
         GPIO.output(Rpin, GPIO.HIGH)
         GPIO.output(Gpin, GPIO.LOW)
-        if not record:
-           
+        if edit == 1: 
             #used the globalcounter to pass in speed factor
+            wav_ctr = index_edit() + 1 
             if globalCounter  == 0:
-                wav_ctr = wav_ctr
+                save_edit(None, -1)
             elif globalCounter < 0: 
-                out_file = "slowdown"+str(wav_ctr)+".wav"
-                wav_ctr= wav_ctr + 1
+                output_file = "slowdown"+str(wav_ctr)+".wav"
             else:
-                out_file = "speedup"+str(wav_ctr)+".wav"
-                wav_ctr= wav_ctr + 1
+                output_file = "speedup"+str(wav_ctr)+".wav"
+                speed_up_wav(input_file, output_file, globalCounter)
+                #reset button 
             
-        
-        
-        
 def speed_up_wav(input_file, output_file, speed_factor):
+    global globalCounter
+    speed_factor = speed_factor + 1.0
     if input_file == None:
         print ("no file inputted--destroying")
         destroy()
@@ -105,21 +142,73 @@ def speed_up_wav(input_file, output_file, speed_factor):
 
     # Save the modified audio
     sped_up.export(output_file, format="wav")
+    save_edit(output_file, 1)
+    globalCounter = 0.0
+    
+def slow_down_wav(input_file, output_file, speed_factor):
+    speed_factor = speed_factor + 1.0
+    # Load the audio file
+    audio = AudioSegment.from_file(input_file, format="wav")
+
+    # Slow down the audio
+    slowed_down = audio._spawn(audio.raw_data, overrides={
+        "frame_rate": int(audio.frame_rate / speed_factor)
+    })
+
+    # Export the modified audio
+    slowed_down.export(output_file, format="wav")
+    # Save the modified audio
+    sped_up.export(output_file, format="wav")
+    save_edit(output_file, 0)
+    globalCounter = 0.0
+
+def save_edit(file, flag):
+    conn = connection("Recordings.db")
+    with conn:
+        if file == None: #no change save the recording as is
+            edit_name = input_file[-4]
+            edit_path = input_file
+            flag = -1
+            sql = '''INSERT INTO edited(flag, edit_name, edit_path)values(?,?,?)'''
+            cur = conn.cursor()
+            cur.execute(sql, (flag,edit_name, edit_path))
+            conn.commit()
+        elif not flag: 
+            edit_name = file[-4]
+            edit_path = file
+            flag = 0
+            sql = '''INSERT INTO edited(flag, edit_name, edit_path)values(?,?,?)'''
+            cur = conn.cursor()
+            cur.execute(sql, (flag,edit_name, edit_path))
+            conn.commit()
+        else:
+            edit_name = file[-4]
+            edit_path = file
+            flag = 1
+            sql = '''INSERT INTO edited(flag, edit_name, edit_path)values(?,?,?)'''
+            cur = conn.cursor()
+            cur.execute(sql, (flag,edit_name, edit_path))
+            conn.commit()
+
     
 #press button to record
 def detect(chn):
     global isGreen
-    global record
+    global isRecording
     isGreen = not isGreen  # Toggle the state
-    if record:
+    if isRecording:
         Led(isGreen)
         record()
+        if isRecording:
+            print("here")
+            isRecording = False
     else:
         Led(isGreen)
 
-    record = not record
+   
     
 def record():
+    global rec_ctr
     #pyaudio set up variables 
     # Constants for the recording
     CHUNK = 1024
@@ -127,11 +216,11 @@ def record():
     CHANNELS = 2
     RATE = 44100
     RECORD_SECONDS = 10
-    WAVE_OUTPUT_FILENAME = "record.wav"
+    rec_ctr = index_original() + 1
+    WAVE_OUTPUT_FILENAME = "recording" + str(rec_ctr)+ ".wav"
 
     p = pyaudio.PyAudio()
     recordAudio(CHUNK, FORMAT,CHANNELS, RATE, RECORD_SECONDS, WAVE_OUTPUT_FILENAME, p)
-
     #then send to db
     
     
