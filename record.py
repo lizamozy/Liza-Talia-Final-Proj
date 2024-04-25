@@ -65,12 +65,12 @@ def recordAudio(CHUNK:int, FORMAT: int, CHANNELS: int, RATE: int, RECORD_SECONDS
     wf.setframerate(RATE)
     wf.writeframes(b''.join(frames))
     wf.close()
-
+    #name = WAVE_OUTPUT_FILENAME
     conn = connection("Recordings.db")
     with conn:
         
         sql = '''INSERT INTO original(rec_name, rec_path)values(?,?)'''
         cur = conn.cursor()
-        cur.execute(sql, (WAVE_OUTPUT_FILENAME[:-4], WAVE_OUTPUT_FILENAME))
+        cur.execute(sql, (WAVE_OUTPUT_FILENAME[6:-4], WAVE_OUTPUT_FILENAME))
         conn.commit()
     conn.close()
