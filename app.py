@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file
 import pandas as pd
 import json
 import plotly
@@ -10,12 +10,14 @@ import matplotlib.pyplot as plt
 import time
 import datetime
 
+
 #all important imports
     #other py files in this folder, simple audio, blah blah
 import thing_file
 import main
 #from main import isRecording
 import record
+import play_audio
 
 # ======== Initialize flask app ===========
 app = Flask(__name__)
@@ -55,11 +57,23 @@ def view_original():
         cur.execute(sql)
         # Fetch all the rows from the result set
         recordings = cur.fetchall()
+        sql = '''select count(*)from original'''
+        cur = conn.cursor()
+        # Execute the select statement
+        cur.execute(sql)
+        size = cur.fetchone()
         print(recordings)
     conn.close()
     return render_template('orig_recordings.html', recordings=recordings)
+
+@app.route('/'+thing_file.thing_name+'/play-audio', methods=['GET'],)
+def play():
+    audioId = request.args.get('audioId')
+    print(audioId)
+    play_audio.play_recording(audioId)
+    return render_template('orig_recordings.html')
     
-    
+
 @app.route('/'+thing_file.thing_name+'/view-edited')
 def view_edited():
     conn = record.connection("Recordings.db")

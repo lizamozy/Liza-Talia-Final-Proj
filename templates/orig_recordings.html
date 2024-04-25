@@ -10,14 +10,14 @@
     <div id="recordings-container">
         {% for recording in recordings %}
             <div class="recording">
-                <p>Recording Name: {{ recording.rec_name }}</p>
+                <p>Recording Name: {{ recording[1] }}</p>
                 <audio controls id="audioPlayer{{ loop.index }}">
-                    <source src="{{ recording.path_name }}" type="audio/wav">
+                    <source src="{{ recording[2] }}" type="audio/wav">
                     Your browser does not support the audio element.
                 </audio>
                 <button class="play-btn" data-audio="audioPlayer{{ loop.index }}">Play</button>
                 <button class="stop-btn" data-audio="audioPlayer{{ loop.index }}">Stop</button>
-                <button class="edit-btn" data-id="{{ recording.id }}">Edit</button>
+                <button class="edit-btn" data-id="{{ recording[0] }}">Edit</button>
             </div>
         {% endfor %}
     </div>
@@ -29,9 +29,8 @@
 
             playBtns.forEach(function(playBtn) {
                 playBtn.addEventListener('click', function() {
-                    var audioId = this.getAttribute('data-audio');
-                    var audioPlayer = document.getElementById(audioId);
-                    audioPlayer.play();
+                    var recordingName = this.parentNode.querySelector('p').innerText.split(": ")[1]; 
+                    fetch('http://128.164.137.157:5000/bc986c10/play-audio?audioId='+ recordingName)
                 });
             });
 
