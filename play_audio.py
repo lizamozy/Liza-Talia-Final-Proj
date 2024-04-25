@@ -17,15 +17,19 @@ def connection(database):
 
 def get_wav(audio):
     conn = connection("Recordings.db")
+    print(audio)
     with conn:
-        sql = '''select rec_path from original where rec_name = (?)'''
+        sql = '''select rec_path from original where rec_name = ?'''
         cur = conn.cursor()
-        cur.execute(sql, audio)
-        return cur.fetchone()
+        cur.execute(sql, (audio,))
+        conn.commit()
+        ret = cur.fetchone()
+        print(ret)
+        return ret
 
     
 def play_recording(audio):
-    wav = get_wav(audio)
+    wav = get_wav(audio)[0]
     print(wav)
     CHUNK = 1024
 
@@ -51,4 +55,4 @@ def play_recording(audio):
         stream.close()
 
         # Release PortAudio system resources (5)
-        p.terminate()
+        #p.terminate()
