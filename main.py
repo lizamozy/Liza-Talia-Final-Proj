@@ -38,20 +38,6 @@ def connection(database):
     except Error as e: 
         print(e)
     return conn
-
-# ======== Initialize flask app ===========
-app = Flask(__name__)
-
-@app.route('/'+thing_file.thing_name)
-def show_home():
-    return render_template('main_page.html')
-
-#record route
-@app.route('/'+thing_file.thing_name+'/record')
-def start_record():
-    #api call to press button to record sound
-    #need to signal the global vairable to chnage recording=True
-    record()
     
 #set up
 def setup():
@@ -254,5 +240,5 @@ if __name__ == '__main__':     # Program start from here
         loop()
     except KeyboardInterrupt:  
         destroy()
-    app.run(host="0.0.0.0", port=8080, debug=True)
+    
    

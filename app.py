@@ -14,7 +14,9 @@ import datetime
     #other py files in this folder, simple audio, blah blah
 import thing_file
 import main
+from main import isRecording
 import record
+
 # ======== Initialize flask app ===========
 app = Flask(__name__)
 
@@ -29,12 +31,13 @@ def show_home():
 def start_record():
     #api call to press button to record sound
     #need to signal the global vairable to chnage recording=True
+    isRecording = True
     try:
         main.loop()
     except KeyboardInterrupt:  
         main.destroy()
     result = main.record()
-    render_template('main_page.html', result=result)
+    return render_template('main_page.html', result=result)
 
 #route to see recordings
 @app.route('/'+thing_file.thing_name+'/view-original')
@@ -49,7 +52,7 @@ def view_original():
         recordings = cur.fetchall()
         print(recordings)
     conn.close()
-    render_template('recordings.html', recordings=recordings)
+    return render_template('orig_recordings.html', recordings=recordings)
     
     
 @app.route('/'+thing_file.thing_name+'/view-edited')
@@ -64,14 +67,7 @@ def view_edited():
         recordings = cur.fetchall()
         print(recordings)
     conn.close()
-    render_template('recordings.html', recordings=recordings)
-    
-
-    
-
-   
-    #next to orginal, have button that says edit
-        #goes to edit route
+    return render_template('edit_recordings.html', recordings=recordings)
 
 #play recording
     #get the path from the database
@@ -81,20 +77,12 @@ def view_edited():
     #except Exception as e:
     #print("Error:", e)
 
-    #if __name__ == "__main__":
-    #file_path = input("Enter the path of the .wav file: ")
-    #play_wav(file_path)
-
 #route to edit
 @app.route('/'+thing_file.thing_name+'/edit')
 def edit_sound():
     #what funcitons do i call to set up the edit audio??? talia needs to clarify
     main.rotaryDeal()
     
-
-#speed up
-
-#slow down
 
 if __name__ == '__main__':
 
