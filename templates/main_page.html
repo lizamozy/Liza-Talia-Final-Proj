@@ -88,7 +88,7 @@
         recordBtn.addEventListener('click', function() {
             alert('You are going to record a new audio. Press the button on the IoT device to proceed.');
             // Add your recording functionality here
-            fetch('http://128.164.137.144:8080/bc986c10/record')
+            fetch('http://128.164.137.157:5000/bc986c10/gorecord')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');

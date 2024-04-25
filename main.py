@@ -21,7 +21,7 @@ isRecording = False #will signal this from the flask app
 wav_ctr= 0
 output_file = None
 input_file = 'recording22.wav'
-edit = 1
+edit = 0
 
 globalCounter = 0.0  # Initialize as a float
 isGreen = False
@@ -48,6 +48,7 @@ def setup():
     GPIO.setup(Gpin, GPIO.OUT)    
     GPIO.setup(Rpin, GPIO.OUT)     
     GPIO.setup(BtnPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)    # Set BtnPin's mode is input, and pull up to high level(3.3V)
+    GPIO.remove_event_detect(BtnPin)
     GPIO.add_event_detect(BtnPin, GPIO.BOTH, callback=detect, bouncetime=300)
 
 def rotaryDeal():
@@ -215,10 +216,12 @@ def btnISR(channel):
     global globalCounter
     globalCounter = 0.0  # Reset to 0.0 instead of 0
     
-def loop():
+def loop(x):
     global globalCounter
+    global isRecording
+    isRecording = x
+    print("IN LOOP ISRECORDING IS: " + str(isRecording) +  "\n\n\n\n")
     tmp = 0.0  # Initialize as a float to store the temporary count
-
     GPIO.add_event_detect(RotPin, GPIO.FALLING, callback=btnISR)
     while True:
         rotaryDeal()
@@ -242,3 +245,4 @@ if __name__ == '__main__':     # Program start from here
         destroy()
     
    
+

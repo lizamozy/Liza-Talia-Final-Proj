@@ -14,7 +14,7 @@ import datetime
     #other py files in this folder, simple audio, blah blah
 import thing_file
 import main
-# from main import isRecording
+#from main import isRecording
 import record
 
 # ======== Initialize flask app ===========
@@ -27,14 +27,18 @@ def show_home():
     return render_template('main_page.html')
 
 #record route
-@app.route('/'+thing_file.thing_name+'/record', methods=['POST'])
+@app.route('/'+thing_file.thing_name+'/gorecord', methods=['GET'])
 def start_record():
+    
     #api call to press button to record sound
     #need to signal the global vairable to chnage recording=True
     #isRecording = True
-    main.setup()
     try:
-        main.loop()
+        main.setup()
+        print("bitch\n")
+        #global isRecording
+        #isRecording = True
+        main.loop(True)
     except KeyboardInterrupt:  
         main.destroy()
     result = main.record()
@@ -92,6 +96,6 @@ if __name__ == '__main__':
     # chmod -x flask_api_server.py
     #
     # Flask GitHub Issue: https://github.com/pallets/flask/issues/3189
-    app.run(host="0.0.0.0", port=8080, debug=True) 
+    app.run(host="0.0.0.0", port=5000, debug=True) 
     
    
