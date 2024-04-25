@@ -14,7 +14,7 @@ import datetime
     #other py files in this folder, simple audio, blah blah
 import thing_file
 import main
-from main import isRecording
+# from main import isRecording
 import record
 
 # ======== Initialize flask app ===========
@@ -31,7 +31,8 @@ def show_home():
 def start_record():
     #api call to press button to record sound
     #need to signal the global vairable to chnage recording=True
-    isRecording = True
+    #isRecording = True
+    main.setup()
     try:
         main.loop()
     except KeyboardInterrupt:  
