@@ -6,7 +6,7 @@
     <title>Recordings</title>
 </head>
 <body>
-    <h1>Recordings</h1>
+    <h1> Edited Recordings</h1>
     <div id="recordings-container">
         {% for recording in recordings %}
             <div class="recording">
@@ -17,7 +17,6 @@
                 </audio>
                 <button class="play-btn" data-audio="audioPlayer{{ loop.index }}">Play</button>
                 <button class="stop-btn" data-audio="audioPlayer{{ loop.index }}">Stop</button>
-                <button class="edit-btn" data-id="{{ recording.id }}">Edit</button>
             </div>
         {% endfor %}
     </div>
@@ -25,7 +24,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             var playBtns = document.querySelectorAll('.play-btn');
             var stopBtns = document.querySelectorAll('.stop-btn');
-            var editBtns = document.querySelectorAll('.edit-btn');
 
             playBtns.forEach(function(playBtn) {
                 playBtn.addEventListener('click', function() {
@@ -44,16 +42,7 @@
                 });
             });
 
-            editBtns.forEach(function(editBtn) {
-                editBtn.addEventListener('click', function() {
-                    var recordingId = this.getAttribute('data-id');
-                    // Redirect or perform edit operation for recording with ID recordingId
-                    alert('Edit functionality for recording with ID ' + recordingId + ' will be implemented here.');
-                });
-            });
         });
     </script>
 </body>
 </html>
-
-
