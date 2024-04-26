@@ -26,10 +26,26 @@ def get_wav(audio):
         ret = cur.fetchone()
         print(ret)
         return ret
-
     
-def play_recording(audio):
-    wav = get_wav(audio)[0]
+def get_edit_wav(audio):
+    conn = connection("Recordings.db")
+    print(audio)
+    with conn:
+        sql = '''select edit_path from edited where edit_name = ?'''
+        cur = conn.cursor()
+        cur.execute(sql, (audio,))
+        conn.commit()
+        ret = cur.fetchone()
+        print(ret)
+        return ret
+    
+def play_recording(audio, flag):
+    if not flag: 
+        wav = get_wav(audio)[0]
+    else:
+        #wav = audio
+        wav = get_edit_wav(audio)[0]
+        
     print(wav)
     CHUNK = 1024
 

@@ -100,18 +100,21 @@ def Led(x):
         GPIO.output(Rpin, GPIO.LOW)
         GPIO.output(Gpin, GPIO.HIGH)
     else:
-        print(isRecording)
+        
         GPIO.output(Rpin, GPIO.HIGH)
         GPIO.output(Gpin, GPIO.LOW)
-        if edit == 1: 
+        if edit == 1:
+            print("bitch")
+            print(globalCounter)
             #used the globalcounter to pass in speed factor
             wav_ctr = index_edit() + 1 
             if globalCounter  == 0:
                 save_edit(None, -1)
             elif globalCounter < 0: 
-                output_file = "slowdown"+str(wav_ctr)+".wav"
+                output_file = "Audio/slowdown"+str(wav_ctr)+".wav"
+                slow_down_wav(input_file, output_file, globalCounter)
             else:
-                output_file = "speedup"+str(wav_ctr)+".wav"
+                output_file = "Audio/speedup"+str(wav_ctr)+".wav"
                 speed_up_wav(input_file, output_file, globalCounter)
                 #reset button 
             
@@ -133,7 +136,8 @@ def speed_up_wav(input_file, output_file, speed_factor):
     globalCounter = 0.0
     
 def slow_down_wav(input_file, output_file, speed_factor):
-    speed_factor = speed_factor + 1.0
+    print("in slow down\n")
+    speed_factor = 1.0 + speed_factor
     # Load the audio file
     audio = AudioSegment.from_file(input_file, format="wav")
 
@@ -145,7 +149,7 @@ def slow_down_wav(input_file, output_file, speed_factor):
     # Export the modified audio
     slowed_down.export(output_file, format="wav")
     # Save the modified audio
-    sped_up.export(output_file, format="wav")
+    #speed_up.export(output_file, format="wav")
     save_edit(output_file, 0)
     globalCounter = 0.0
 
@@ -153,15 +157,15 @@ def save_edit(file, flag):
     conn = connection("Recordings.db")
     with conn:
         if file == None: #no change save the recording as is
-            edit_name = input_file[-4]
+            edit_name = input_file[6:-4]
             edit_path = input_file
             flag = -1
             sql = '''INSERT INTO edited(flag, edit_name, edit_path)values(?,?,?)'''
             cur = conn.cursor()
             cur.execute(sql, (flag,edit_name, edit_path))
             conn.commit()
-        elif not flag: 
-            edit_name = file[-4]
+        elif flag == 0: 
+            edit_name = file[6:-4]
             edit_path = file
             flag = 0
             sql = '''INSERT INTO edited(flag, edit_name, edit_path)values(?,?,?)'''
@@ -169,7 +173,7 @@ def save_edit(file, flag):
             cur.execute(sql, (flag,edit_name, edit_path))
             conn.commit()
         else:
-            edit_name = file[-4]
+            edit_name = file[6:-4]
             edit_path = file
             flag = 1
             sql = '''INSERT INTO edited(flag, edit_name, edit_path)values(?,?,?)'''
@@ -227,6 +231,7 @@ def loop(x, y, file):
         input_file = file
     print("IN LOOP ISRECORDING IS: " + str(isRecording) +  "\n\n\n\n")
     tmp = 0.0  # Initialize as a float to store the temporary count
+    GPIO.remove_event_detect(RotPin)
     GPIO.add_event_detect(RotPin, GPIO.FALLING, callback=btnISR)
     while True:
         rotaryDeal()

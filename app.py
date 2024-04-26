@@ -69,9 +69,17 @@ def view_original():
 def play():
     audioId = request.args.get('audioId')
     print(audioId)
-    play_audio.play_recording(audioId)
+    play_audio.play_recording(audioId, 0)
     return render_template('orig_recordings.html')
-    
+
+@app.route('/'+thing_file.thing_name+'/play-edit-audio', methods=['GET'],)
+def edit_play():
+    audioId = request.args.get('audioId')
+    print("in edit play:")
+    print(audioId)
+    play_audio.play_recording(audioId, 1)
+    return render_template('edit_recordings.html')
+
 
 @app.route('/'+thing_file.thing_name+'/view-edited')
 def view_edited():
