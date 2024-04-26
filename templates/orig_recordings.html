@@ -45,9 +45,10 @@
 
             editBtns.forEach(function(editBtn) {
                 editBtn.addEventListener('click', function() {
-                    var recordingId = this.getAttribute('data-id');
+                    var recordingName = this.parentNode.querySelector('p').innerText.split(": ")[1]; 
+                    fetch('http://128.164.137.157:5000/bc986c10/edit?audioId='+ recordingName)
                     // Redirect or perform edit operation for recording with ID recordingId
-                    alert('Edit functionality for recording with ID ' + recordingId + ' will be implemented here.');
+                    alert('Please press button then turn rotary to desired output speed.\n Press button once done :)');
                 });
             });
         });

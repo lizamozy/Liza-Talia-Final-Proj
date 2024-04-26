@@ -37,10 +37,9 @@ def start_record():
     #isRecording = True
     try:
         main.setup()
-        print("bitch\n")
         #global isRecording
         #isRecording = True
-        main.loop(True)
+        main.loop(True, 0, None)
     except KeyboardInterrupt:  
         main.destroy()
     result = main.record()
@@ -97,10 +96,19 @@ def view_edited():
     #print("Error:", e)
 
 #route to edit
-@app.route('/'+thing_file.thing_name+'/edit')
+@app.route('/'+thing_file.thing_name+'/edit',  methods=['GET'],)
 def edit_sound():
+    audioId = request.args.get('audioId')
+    path = 'Audio/' + audioId + '.wav'
     #what funcitons do i call to set up the edit audio??? talia needs to clarify
-    main.rotaryDeal()
+    try:
+        main.setup()
+        #global isRecording
+        #isRecording = True
+        main.loop(False, 1, path)
+    except KeyboardInterrupt:  
+        main.destroy()
+
     
 
 if __name__ == '__main__':

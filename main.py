@@ -20,7 +20,7 @@ Rpin   = 16     #red
 isRecording = False #will signal this from the flask app
 wav_ctr= 0
 output_file = None
-input_file = 'recording22.wav'
+input_file = None
 edit = 0
 
 globalCounter = 0.0  # Initialize as a float
@@ -187,7 +187,6 @@ def detect(chn):
         Led(isGreen)
         record()
         if isRecording:
-            print("here")
             isRecording = False
     else:
         Led(isGreen)
@@ -216,10 +215,16 @@ def btnISR(channel):
     global globalCounter
     globalCounter = 0.0  # Reset to 0.0 instead of 0
     
-def loop(x):
+def loop(x, y, file):
     global globalCounter
+    global edit
+    global input_file
     global isRecording
     isRecording = x
+    if y: 
+        edit = y
+    if file: 
+        input_file = file
     print("IN LOOP ISRECORDING IS: " + str(isRecording) +  "\n\n\n\n")
     tmp = 0.0  # Initialize as a float to store the temporary count
     GPIO.add_event_detect(RotPin, GPIO.FALLING, callback=btnISR)
